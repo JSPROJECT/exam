@@ -3,7 +3,7 @@
 <%@page import="kosta.model.FileDownloadHelper"%><%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
    
-<%
+<%   
 	request.setCharacterEncoding("utf-8");
 	response.reset();
 	String fileName = request.getParameter("filename");
