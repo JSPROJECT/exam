@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kosta.mapper.BoardMapper">
+	<cache />
+	<insert id="insertBoard" parameterType="Board">
+		insert into board2 values(#{b_id},#{b_name},#{b_title},#{b_content},#{b_pwd},SYSDATE,0,#{b_ref},#{b_step},#{b_level},#{b_fname})
+	</insert>
+	<select id="listBoard" resultType="Board" parameterType="Search">
+		select * from board2	
+		<if test="area != null">
+			<where>
+				<foreach collection="area" item="item" separator="or" open="(" close=")">
+					${item} like #{searchKey}
+				</foreach>
+			</where>
+		</if>
+		order by b_ref desc, b_step asc
+	</select>
+	
+	<select id="selectBoard" parameterType="int" resultType="Board">
+		select * from board2 where b_id = #{b_id}
+	</select>
+	<update id="updatehitBoard" parameterType="int">
+		update board2
+		set b_hit = (select Max(b_hit)+1 from board2 where b_id = #{b_id})
+		where b_id = #{b_id}
+	</update>
+	
+	<update id="updateBoardcontent" parameterType="Board">
+		update board2
+		set b_content = #{b_content},b_name = #{b_name},b_date = SYSDATE, b_title = #{b_title}
+		where b_id = #{b_id}
+	</update>
+	
+	<update id="updateStep" parameterType="java.util.HashMap">
+		update board2 set b_step = b_step +1
+		where b_ref = #{b_ref} and b_step > #{b_step}
+	</update>
+	<select id="selectB_id" resultType="Integer">
+		select Max(b_id) from board2
+	</select>
+	
+	<select id="countBoard" resultType="int" parameterType="Search">
+		select count(*) from board2
+		<if test="area != null">
+			 <where>
+				<foreach collection="area" item="item" open="(" separator="or" close=")">
+					${item} like #{searchKey}
+				</foreach>
+			</where>
+		</if>
+		order by b_ref desc, b_step asc
+	</select>
+	
+	<select id="replyList" parameterType="int" resultType="Reply">
+		select * from reply where b_id = #{b_id}
+	</select>
+	
+	<insert id="insertReply" parameterType="Reply">
+		insert into reply values((select NVL(Max(R_ID),0)+1 from reply),#{r_content},#{r_name},#{b_id})
+	</insert>
+</mapper>
